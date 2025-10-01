@@ -41,7 +41,7 @@ export default function Home() {
             priority
           />
         )}
-        <div className="container relative z-10 mx-auto text-center">
+        <div className="container relative z-10 text-center">
           <div className="mb-4">
             <span className="pill">Celebrate Life</span>
           </div>

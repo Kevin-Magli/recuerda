@@ -1,3 +1,94 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-1",
+      "description": "A serene, abstract background with light blue and cyan tones.",
+      "imageUrl": "https://images.unsplash.com/photo-1503004673012-456db6b54b16?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxhYnN0cmFjdCUyMHNlcmVuZXxlbnwwfHx8fDE3NTkzNTk2NjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract serene"
+    },
+    {
+      "id": "memorial-1",
+      "description": "Profile image for John Doe.",
+      "imageUrl": "https://images.unsplash.com/photo-1672794444732-e007954a177c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-2",
+      "description": "Profile image for Jane Smith.",
+      "imageUrl": "https://images.unsplash.com/photo-1647104441834-a06d63865c0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-3",
+      "description": "Profile image for Robert Brown.",
+      "imageUrl": "https://images.unsplash.com/photo-1635521034430-b4c9ca9f1904?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-4",
+      "description": "Profile image for Emily White.",
+      "imageUrl": "https://images.unsplash.com/photo-1672794444732-e007954a177c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-5",
+      "description": "Profile image for Michael Green.",
+      "imageUrl": "https://images.unsplash.com/photo-1647104441834-a06d63865c0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-6",
+      "description": "Profile image for Sarah Black.",
+      "imageUrl": "https://images.unsplash.com/photo-1586299485759-f62264d6b63f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-7",
+      "description": "Profile image for David Gray.",
+      "imageUrl": "https://images.unsplash.com/photo-1635521034430-b4c9ca9f1904?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "memorial-8",
+      "description": "Profile image for Laura Blue.",
+      "imageUrl": "https://images.unsplash.com/photo-1647104441834-a06d63865c0a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NTkzMjc5Mjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "portrait person"
+    },
+    {
+      "id": "gallery-1",
+      "description": "Gallery image 1.",
+      "imageUrl": "https://images.unsplash.com/photo-1602255680702-c47261041a97?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYW1pbHklMjBwaG90b3xlbnwwfHx8fDE3NTkzMTE1OTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "family photo"
+    },
+    {
+      "id": "gallery-2",
+      "description": "Gallery image 2.",
+      "imageUrl": "https://images.unsplash.com/photo-1647095049057-8d054293f982?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxoYXBweSUyMG1lbW9yeXxlbnwwfHx8fDE3NTkzNTk2NjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "happy memory"
+    },
+    {
+      "id": "gallery-3",
+      "description": "Gallery image 3.",
+      "imageUrl": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0cmF2ZWwlMjBsYW5kc2NhcGV8ZW58MHx8fHwxNzU5MzQxNzYyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "travel landscape"
+    },
+    {
+      "id": "gallery-4",
+      "description": "Gallery image 4.",
+      "imageUrl": "https://images.unsplash.com/photo-1758810411514-1cffb1420a4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjZWxlYnJhdGlvbiUyMGV2ZW50fGVufDB8fHx8MTc1OTM1OTY2MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "celebration event"
+    },
+    {
+      "id": "gallery-5",
+      "description": "Gallery image 5.",
+      "imageUrl": "https://images.unsplash.com/photo-1692475605762-0b53aebc7d49?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxob2JieSUyMGFjdGl2aXR5fGVufDB8fHx8MTc1OTM1OTY2MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hobby activity"
+    },
+    {
+      "id": "gallery-6",
+      "description": "Gallery image 6.",
+      "imageUrl": "https://images.unsplash.com/photo-1534582929036-cc7f1bb2043e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bmF0dXJlJTIwd2Fsa3xlbnwwfHx8fDE3NTkzNTk2NjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "nature walk"
+    }
+  ]
 }

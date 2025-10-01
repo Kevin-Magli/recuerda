@@ -7,8 +7,10 @@ type LogoProps = {
 
 export function Logo({ className }: LogoProps) {
   return (
-    <Link href="/" className={cn("text-xl font-bold text-foreground", className)}>
-      <span className="font-headline">Recuerda</span>
+    <Link href="/" className={cn("font-bold", className)}>
+      <span className="font-headline text-2xl bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
+        Recuerda
+      </span>
     </Link>
   );
 }

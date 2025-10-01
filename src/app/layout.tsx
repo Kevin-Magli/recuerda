@@ -5,7 +5,7 @@ import { Footer } from '@/components/footer';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Eternity Pages',
+  title: 'Recuerda',
   description: 'A beautiful, respectful, and welcoming space to create memorial pages for your loved ones.',
 };
 

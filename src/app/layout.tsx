@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import './globals.css';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'Recuerda',
@@ -22,10 +23,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <Toaster />
+        <FirebaseClientProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+          <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );

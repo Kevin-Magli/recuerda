@@ -1,0 +1,140 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account in the Eternity Pages application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user account."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "userRole": {
+          "type": "string",
+          "description": "Role of the user (guest, free user, subscriber, funeral home, admin).",
+          "format": "string"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "userRole"
+      ]
+    },
+    "MemorialPage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MemorialPage",
+      "type": "object",
+      "description": "Represents a memorial page created for a loved one.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the memorial page."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who created the memorial page. (Relationship: User 1:N MemorialPage)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the memorial page."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description or summary of the memorial page content."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Date and time when the memorial page was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "description",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. This collection uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/memorialPages/{memorialPageId}",
+        "definition": {
+          "entityName": "MemorialPage",
+          "schema": {
+            "$ref": "#/backend/entities/MemorialPage"
+          },
+          "description": "Stores memorial pages created by users. This collection uses path-based ownership. The 'userId' is duplicated from the parent document for Authorization Independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who owns the memorial page."
+            },
+            {
+              "name": "memorialPageId",
+              "description": "The unique identifier for the memorial page."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "adminRole",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin roles. The existence of a document with a user ID in this collection grants admin privileges. Uses 'Existence over Content'.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the admin user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure Authorization Independence, DBAC (Database-Based Access Control), and simple, secure rules. User data is stored in `/users/{userId}` with the profile information. Memorial pages are stored in `/users/{userId}/memorialPages/{memorialPageId}` to establish clear ownership. An admin role is managed through the `/roles_admin/{userId}` collection. The existence of a document in this collection grants admin privileges, following the principle of 'Existence over Content'. This approach avoids complex `get()` calls in security rules, supporting atomic operations and easy debugging. It also enables simple `list` operations. The structure strictly separates different types of data, ensuring a homogeneous security posture for each collection. All documents in a collection share the same security requirements."
+  }
+}

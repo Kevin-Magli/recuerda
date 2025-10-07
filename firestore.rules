@@ -1,0 +1,106 @@
+/**
+ * @fileOverview
+ * This ruleset enforces a strict user-ownership model for user profiles and their memorial pages,
+ * with an additional role-based access control for administrative privileges.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores user profile information, accessible only by the user themselves or an admin.
+ * - /users/{userId}/memorialPages/{memorialPageId}: Stores memorial pages created by users, accessible only by the creating user or an admin.
+ * - /roles_admin/{userId}: Presence of a document grants the user admin privileges. No data is stored in the document.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed to protect privacy.
+ * - Admin privileges are granted based on the existence of a document in the /roles_admin/{userId} collection.
+ * - Data validation is minimized for rapid prototyping, focusing on relational integrity (e.g., userId consistency).
+ *
+ * Denormalization for Authorization:
+ * - The `userId` is duplicated in the `/users/{userId}/memorialPages/{memorialPageId}` path and within the memorial page document itself. This allows security rules to validate the owner based on the path without additional `get()` operations.
+ * - Admin privileges are determined by the presence of a document in the `/roles_admin/{userId}` collection, avoiding the need to read the user's profile to determine their role.
+ *
+ * Structural Segregation:
+ * - Admin roles are stored in a separate top-level collection (`/roles_admin`) rather than within the user document. This simplifies access control and avoids the need to modify the user document schema when granting admin privileges.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Controls access to user profile information.
+     * @path /users/{userId}
+     * @allow (get) Authenticated user can read their own profile.
+     * @allow (create) Authenticated user can create their own profile if the userId matches their auth UID.
+     * @allow (update) Authenticated user can update their own profile if the userId matches their auth UID.
+     * @allow (delete) Authenticated user can delete their own profile if the userId matches their auth UID.
+     * @deny (get) Authenticated user cannot read another user's profile.
+     * @deny (create) Authenticated user cannot create a profile with a userId that doesn't match their auth UID.
+     * @deny (update) Authenticated user cannot update another user's profile.
+     * @deny (delete) Authenticated user cannot delete another user's profile.
+     * @principle Enforces document ownership for writes; allows owner-only reads and writes.
+     */
+    match /users/{userId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if false; // User listing is disallowed for privacy.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == request.auth.uid;
+      allow update: if isSignedIn() && (isOwner(userId) || isAdmin()) && resource.data.id == request.resource.data.id;
+      allow delete: if isSignedIn() && (isOwner(userId) || isAdmin()) && isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to memorial pages created by users.
+     * @path /users/{userId}/memorialPages/{memorialPageId}
+     * @allow (get) Authenticated user can read their own memorial pages.
+     * @allow (create) Authenticated user can create memorial pages under their own user ID.
+     * @allow (update) Authenticated user can update their own memorial pages.
+     * @allow (delete) Authenticated user can delete their own memorial pages.
+     * @deny (get) Authenticated user cannot read memorial pages under another user's ID.
+     * @deny (create) Authenticated user cannot create memorial pages under another user's ID.
+     * @deny (update) Authenticated user cannot update memorial pages under another user's ID.
+     * @deny (delete) Authenticated user cannot delete memorial pages under another user's ID.
+     * @principle Enforces document ownership for writes; allows owner-only reads and writes; validates path consistency.
+     */
+    match /users/{userId}/memorialPages/{memorialPageId} {
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isSignedIn() && (isOwner(userId) || isAdmin()) && resource.data.userId == userId;
+      allow delete: if isSignedIn() && (isOwner(userId) || isAdmin()) && resource.data.userId == userId && resource != null;
+    }
+
+    /**
+     * @description Grants admin privileges based on the existence of a document in this collection.
+     * @path /roles_admin/{userId}
+     * @allow (get) Anyone can check if a user is an admin.
+     * @allow (create) Only an existing admin can grant another user admin privileges.
+     * @allow (update) Only an existing admin can modify admin privileges.
+     * @allow (delete) Only an existing admin can revoke admin privileges.
+     * @deny (create) Non-admins cannot grant admin privileges.
+     * @deny (update) Non-admins cannot modify admin privileges.
+     * @deny (delete) Non-admins cannot revoke admin privileges.
+     * @principle Implements role-based access control using "Existence over Content"; restricts role management to existing admins.
+     */
+    match /roles_admin/{userId} {
+      allow get: if isSignedIn() && isAdmin();
+      allow list: if false; //No listing of admins for security reasons
+      allow create: if isSignedIn() && isAdmin();
+      allow update: if isSignedIn() && isAdmin() && resource != null;
+      allow delete: if isSignedIn() && isAdmin() && resource != null;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+  }
+}

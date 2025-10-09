@@ -1,7 +1,9 @@
 'use client';
 import { getFunctions } from 'firebase/functions';
-import { useFirebaseApp } from '@/firebase';
+import { getApp } from 'firebase/app';
 
-// Initialize and export functions
-const app = useFirebaseApp();
-export const functions = getFunctions(app);
+// This is a simplified getter for the functions instance.
+// It assumes the app is already initialized.
+export function getFirebaseFunctions() {
+    return getFunctions(getApp());
+}

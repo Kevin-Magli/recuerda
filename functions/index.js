@@ -6,6 +6,7 @@ admin.initializeApp();
 exports.makeAdmin = functions.https.onCall(async (data, context) => {
   // 1. Authentication Check
   // Ensure the user calling the function is an admin.
+  // This is crucial for security.
   if (context.auth.token.isAdmin !== true) {
     throw new functions.https.HttpsError(
       "permission-denied",
@@ -25,6 +26,8 @@ exports.makeAdmin = functions.https.onCall(async (data, context) => {
     
     // 4. Update Firestore for Redundancy (Optional but good practice)
     // This makes it easy to query for all admins later if needed.
+    // Note: The original request to check the 'roles_admin' collection is now
+    // superseded by this Custom Claim logic, but writing here creates consistency.
     await admin.firestore().collection("roles_admin").doc(user.uid).set({
         isAdmin: true
     });
@@ -38,6 +41,7 @@ exports.makeAdmin = functions.https.onCall(async (data, context) => {
          `User with email ${email} was not found.`
        );
     }
+    // For other errors, return a generic internal error.
     throw new functions.https.HttpsError(
       "internal",
       "An internal error occurred."

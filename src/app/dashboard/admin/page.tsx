@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { functions } from "@/firebase/functions"; // We will create this
-import { httpsCallable } from "firebase/functions";
+import { useFirebaseApp } from "@/firebase";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 // We will define this function in a new file
-const makeAdmin = httpsCallable(functions, 'makeAdmin');
+const makeAdminCallable = httpsCallable(getFunctions(useFirebaseApp()), 'makeAdmin');
 
 export default function AdminPage() {
   const [email, setEmail] = useState("");
@@ -34,7 +34,7 @@ export default function AdminPage() {
     }
     setIsLoading(true);
     try {
-      const result = await makeAdmin({ email });
+      const result = await makeAdminCallable({ email });
       console.log(result);
       toast({
         title: "Success!",

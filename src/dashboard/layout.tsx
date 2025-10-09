@@ -6,6 +6,7 @@ import {
   LogOut,
   Settings,
   User as UserIcon,
+  Shield,
 } from "lucide-react"
 import { usePathname, useRouter } from 'next/navigation'
 import { getAuth, signOut } from "firebase/auth"
@@ -45,7 +46,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const router = useRouter()
   const isActive = (path: string) => pathname === path
-  const { user } = useUser()
+  const { user, isAdmin } = useUser()
   const auth = getAuth()
 
   const handleLogout = async () => {
@@ -107,6 +108,20 @@ export default function DashboardLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {isAdmin && (
+               <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Admin"
+                  isActive={isActive("/dashboard/admin")}
+                >
+                  <Link href="/dashboard/admin">
+                    <Shield />
+                    Admin
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild

@@ -6,8 +6,16 @@
 // 3. Rode o script: node make-admin.js seu-email@exemplo.com
 
 const admin = require('firebase-admin');
-// Importa a configuração do Firebase para obter o projectId
-const { firebaseConfig } = require('./src/firebase/config.ts');
+
+// Configuração do Firebase - Colada diretamente aqui para evitar erros de importação
+const firebaseConfig = {
+  "projectId": "studio-5819073523-156bd",
+  "appId": "1:333068583551:web:6c3a909613be29a464354a",
+  "apiKey": "AIzaSyC_C0TCec5bEqmATptvH6U_BPmsZufDlr0",
+  "authDomain": "studio-5819073523-156bd.firebaseapp.com",
+  "measurementId": "",
+  "messagingSenderId": "333068583551"
+};
 
 // Pega o email da linha de comando
 const email = process.argv[2];

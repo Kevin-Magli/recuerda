@@ -76,7 +76,7 @@ export default function DashboardLayout({
                     />
                     <AvatarFallback>{user?.displayName?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">{user?.displayName || "User"}</span>
+                  <span className="text-sm font-medium text-foreground">{user?.displayName || "User"}</span>
                 </div>
                 <UserIcon className="h-4 w-4 text-muted-foreground" />
               </Button>

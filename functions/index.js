@@ -3,6 +3,9 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
+// Exporta a instância do admin para que possa ser usada no shell
+exports.admin = admin;
+
 exports.makeAdmin = functions.https.onCall(async (data, context) => {
   // 1. Authentication Check
   // Ensure the user calling the function is an admin.

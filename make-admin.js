@@ -1,27 +1,13 @@
 // Este script define um usuário como administrador no Firebase.
 // USO:
-// 1. Verifique se você está autenticado no Firebase CLI (`firebase login`).
-// 2. Verifique se o seu projeto está selecionado (`firebase use <project_id>`).
+// 1. Defina a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS para o caminho do seu arquivo de chave de serviço.
+//    (Baixe a chave de: Console do Firebase > Configurações do Projeto > Contas de Serviço > Gerar nova chave privada)
+// 2. Verifique se você está autenticado no Firebase CLI (`firebase login`).
 // 3. Rode o script: node make-admin.js seu-email@exemplo.com
 
 const admin = require('firebase-admin');
-
-// INICIALIZAÇÃO:
-// O SDK Admin precisa das credenciais do seu projeto.
-// A maneira mais fácil é definir a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
-// para o caminho do seu arquivo de chave de serviço.
-// Baixe a chave de: Console do Firebase > Configurações do Projeto > Contas de Serviço > Gerar nova chave privada.
-// OU, se estiver rodando em um ambiente Google (como o Cloud Shell), ele pode encontrar as credenciais automaticamente.
-
-try {
-  admin.initializeApp();
-  console.log("SDK Admin inicializado com credenciais de ambiente padrão.");
-} catch (e) {
-  console.error("Falha na inicialização padrão. Você precisa configurar as credenciais.");
-  console.error("Consulte: https://firebase.google.com/docs/admin/setup#initialize-sdk");
-  process.exit(1);
-}
-
+// Importa a configuração do Firebase para obter o projectId
+const { firebaseConfig } = require('./src/firebase/config.ts');
 
 // Pega o email da linha de comando
 const email = process.argv[2];
@@ -31,6 +17,21 @@ if (!email) {
   console.error('Uso: node make-admin.js seu-email@exemplo.com');
   process.exit(1);
 }
+
+try {
+  // Inicializa o SDK Admin com o Project ID explícito
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(),
+    projectId: firebaseConfig.projectId,
+  });
+  console.log(`SDK Admin inicializado para o projeto: ${firebaseConfig.projectId}.`);
+} catch (e) {
+  console.error("Falha na inicialização do SDK Admin.");
+  console.error("Verifique se a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS está definida corretamente.");
+  console.error(e);
+  process.exit(1);
+}
+
 
 console.log(`Tentando tornar "${email}" um administrador...`);
 

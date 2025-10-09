@@ -1,12 +1,58 @@
+"use client";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { functions } from "@/firebase/functions"; // We will create this
+import { httpsCallable } from "firebase/functions";
+
+// We will define this function in a new file
+const makeAdmin = httpsCallable(functions, 'makeAdmin');
 
 export default function AdminPage() {
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleMakeAdmin = async () => {
+    if (!email) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter an email address.",
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const result = await makeAdmin({ email });
+      console.log(result);
+      toast({
+        title: "Success!",
+        description: `${email} has been made an admin.`,
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message || "Could not complete the request.",
+      });
+    } finally {
+      setIsLoading(false);
+      setEmail("");
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -16,17 +62,38 @@ export default function AdminPage() {
         </p>
       </div>
 
-      <Card className="rounded-[30px]">
+      <Card className="rounded-[30px] max-w-md">
         <CardHeader>
-          <CardTitle>Admin Features</CardTitle>
+          <CardTitle>Promote User to Admin</CardTitle>
           <CardDescription>
-            This is where the admin-specific components and management tools will go.
+            Enter the email address of the user you want to make an
+            administrator. They will need to log out and log back in for the
+            changes to take effect.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Coming soon...</p>
+          <div className="space-y-2">
+            <label htmlFor="email">User Email</label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="user@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+            />
+          </div>
         </CardContent>
+        <CardFooter>
+          <Button
+            onClick={handleMakeAdmin}
+            disabled={isLoading}
+            className="rounded-[30px]"
+          >
+            {isLoading ? "Promoting..." : "Make Admin"}
+          </Button>
+        </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

@@ -32,6 +32,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Logo } from "@/components/logo"
 import { useToast } from "@/hooks/use-toast"
+import { Header } from "@/components/header"
+import { Footer } from "@/components/footer"
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters."),
@@ -93,80 +95,84 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-sm rounded-[30px] shadow-lg">
-        <CardHeader className="text-center">
-          <Logo className="mb-4 justify-center" />
-          <CardTitle className="font-headline text-2xl">
-            Create an Account
-          </CardTitle>
-          <CardDescription>Start preserving precious memories today.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-              <FormField
-                control={form.control}
-                name="fullName"
-                render={({ field }) => (
-                  <FormItem className="grid gap-2">
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Max" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="grid gap-2">
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="m@example.com"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="grid gap-2">
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="w-full rounded-[30px] bg-gradient-to-br from-primary to-accent text-primary-foreground"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting
-                  ? "Creating Account..."
-                  : "Create Account"}
-              </Button>
-            </form>
-          </Form>
-          <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/login" className="underline text-primary">
-              Log in
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <Header />
+      <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center bg-muted/30 p-4">
+        <Card className="w-full max-w-sm rounded-[30px] shadow-lg">
+          <CardHeader className="text-center">
+            <Logo className="mb-4 justify-center" />
+            <CardTitle className="font-headline text-2xl">
+              Create an Account
+            </CardTitle>
+            <CardDescription>Start preserving precious memories today.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Max" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="m@example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input type="password" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full rounded-[30px] bg-gradient-to-br from-primary to-accent text-primary-foreground"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting
+                    ? "Creating Account..."
+                    : "Create Account"}
+                </Button>
+              </form>
+            </Form>
+            <div className="mt-4 text-center text-sm">
+              Already have an account?{" "}
+              <Link href="/login" className="underline text-primary">
+                Log in
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <Footer />
+    </>
   )
 }

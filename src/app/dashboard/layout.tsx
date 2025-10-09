@@ -4,11 +4,13 @@ import {
   BookUser,
   Home,
   LogOut,
-  PlusCircle,
   Settings,
-  User,
+  User as UserIcon,
+  Shield,
 } from "lucide-react"
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { getAuth, signOut } from "firebase/auth"
+import { useUser } from "@/firebase"
 
 import {
   Avatar,
@@ -42,7 +44,19 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const isActive = (path: string) => pathname === path
+  const { user, isAdmin } = useUser()
+  const auth = getAuth()
+
+  const handleLogout = async () => {
+    await signOut(auth)
+    router.push("/")
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <SidebarProvider>
@@ -57,27 +71,27 @@ export default function DashboardLayout({
                 <div className="flex items-center gap-2">
                   <Avatar className="h-6 w-6">
                     <AvatarImage
-                      src="https://picsum.photos/seed/user/40/40"
-                      alt="User"
+                      src={user?.photoURL || "https://picsum.photos/seed/user/40/40"}
+                      alt={user?.displayName || "User"}
                     />
-                    <AvatarFallback>U</AvatarFallback>
+                    <AvatarFallback>{user?.displayName?.charAt(0) || "U"}</AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">Jane Doe</span>
+                  <span className="text-sm font-medium">{user?.displayName || "User"}</span>
                 </div>
-                <User className="h-4 w-4 text-muted-foreground" />
+                <UserIcon className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Jane Doe</p>
+                  <p className="text-sm font-medium leading-none">{user?.displayName}</p>
                   <p className="text-xs leading-none text-muted-foreground">
-                    jane.doe@example.com
+                    {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
@@ -98,6 +112,20 @@ export default function DashboardLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {isAdmin && (
+               <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  tooltip="Admin"
+                  isActive={isActive("/dashboard/admin")}
+                >
+                  <Link href="/dashboard/admin">
+                    <Shield />
+                    Admin
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild

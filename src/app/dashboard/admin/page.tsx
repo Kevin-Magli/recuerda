@@ -6,25 +6,25 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useFirebaseApp } from "@/firebase";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { useFirebase } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
+import Link from "next/link";
+
 
 export default function AdminPage() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const app = useFirebaseApp();
-  const functions = getFunctions(app);
+  const { firestore, isAdmin } = useFirebase();
 
-  // Define the callable function, pointing to the 'makeAdmin' function deployed.
-  const makeAdminCallable = httpsCallable(functions, 'makeAdmin');
-
+  // This is a placeholder function now.
+  // The actual logic will be to write to a 'roles_admin' collection
+  // which will require new Firestore rules.
   const handleMakeAdmin = async () => {
     if (!email) {
       toast({
@@ -34,27 +34,11 @@ export default function AdminPage() {
       });
       return;
     }
-    setIsLoading(true);
-    try {
-      // The first admin must be set manually via gcloud CLI.
-      // After that, they can use this page.
-      const result = await makeAdminCallable({ email });
-      console.log(result.data);
-      toast({
-        title: "Success!",
-        description: `${email} has been made an admin.`,
-      });
-    } catch (error: any) {
-      console.error("Function call error:", error);
-      toast({
+     toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message || "Could not complete the request. Note: Only admins can perform this action.",
+        title: "Not Implemented",
+        description: "This functionality requires Cloud Functions, which are not available on the current plan.",
       });
-    } finally {
-      setIsLoading(false);
-      setEmail("");
-    }
   };
 
   return (
@@ -65,14 +49,28 @@ export default function AdminPage() {
           Welcome, Admin! Manage users and site content here.
         </p>
       </div>
+      
+      {!isAdmin && (
+         <Card className="rounded-[30px] max-w-md bg-destructive/10 border-destructive/50">
+            <CardHeader>
+                <CardTitle>Become the First Admin</CardTitle>
+                <CardDescription className="text-destructive-foreground/80">
+                   To get started, you need to claim the administrator role. This is a one-time action for the first user.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild className="rounded-[30px]">
+                    <Link href="/claim-admin">Claim Admin Role</Link>
+                </Button>
+            </CardContent>
+      </Card>
+      )}
 
       <Card className="rounded-[30px] max-w-md">
         <CardHeader>
           <CardTitle>Promote User to Admin</CardTitle>
           <CardDescription>
-            Enter the email address of the user you want to make an
-            administrator. They will need to log out and log back in for the
-            changes to take effect.
+            This feature is not available on the current free plan. To grant admin access to other users, you must manually add their user ID to the 'roles_admin' collection in your Firestore database.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,37 +82,19 @@ export default function AdminPage() {
               placeholder="user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
+              disabled={true}
             />
           </div>
         </CardContent>
         <CardFooter>
           <Button
             onClick={handleMakeAdmin}
-            disabled={isLoading}
+            disabled={true}
             className="rounded-[30px]"
           >
-            {isLoading ? "Promoting..." : "Make Admin"}
+            Make Admin
           </Button>
         </CardFooter>
-      </Card>
-      
-      <Card className="rounded-[30px] max-w-md bg-destructive/10 border-destructive/50">
-        <CardHeader>
-            <CardTitle>First Admin Setup</CardTitle>
-            <CardDescription className="text-destructive-foreground/80">
-                To promote the very first admin, you must use the gcloud command-line tool after deploying this function. This is a one-time security step.
-            </CardDescription>
-        </CardHeader>
-        <CardContent className="text-sm">
-            <p className="font-semibold">After deploying:</p>
-            <ol className="list-decimal list-inside space-y-1 mt-2 text-destructive-foreground/80">
-                <li>Install the gcloud CLI.</li>
-                <li>Run `gcloud auth login`</li>
-                <li>Run `gcloud projects list` to find your Project ID.</li>
-                <li>Run `gcloud functions call makeAdmin --project=YOUR_PROJECT_ID --data='{"data":{"email":"your-email@example.com"}}'`</li>
-            </ol>
-        </CardContent>
       </Card>
 
     </div>

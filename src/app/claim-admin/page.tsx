@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function ClaimAdminPage() {
@@ -19,7 +19,7 @@ export default function ClaimAdminPage() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const handleClaimAdmin = async () => {
+  const handleClaimAdmin = () => {
     if (!user || !firestore) {
       toast({
         variant: "destructive",
@@ -30,29 +30,19 @@ export default function ClaimAdminPage() {
     }
 
     const adminRoleRef = doc(firestore, "roles_admin", user.uid);
+    const roleData = { grantedAt: new Date().toISOString() };
 
-    try {
-      // We are not awaiting this. We navigate away and let it process.
-      // The `onIdTokenChanged` listener in the provider will automatically
-      // pick up the new "isAdmin" claim when the user's token refreshes.
-      await setDoc(adminRoleRef, { grantedAt: new Date() });
-      
-      toast({
-        title: "Success!",
-        description: "You have claimed the administrator role. Please allow a moment for permissions to update.",
-      });
+    // This is now a non-blocking call.
+    // The error will be caught and emitted by setDocumentNonBlocking.
+    setDocumentNonBlocking(adminRoleRef, roleData, {});
+    
+    toast({
+      title: "Processing...",
+      description: "Your request to claim the admin role is being processed. You will be redirected shortly.",
+    });
 
-      // Redirect to the admin dashboard. The `useUser` hook will update with the new role.
-      router.push("/dashboard/admin");
-
-    } catch (error: any) {
-        console.error("Failed to claim admin role:", error);
-         toast({
-            variant: "destructive",
-            title: "Uh oh! Something went wrong.",
-            description: "Could not claim admin role. It's possible another user has already claimed it. Check Firestore rules if the issue persists.",
-      });
-    }
+    // Redirect optimistically. The auth listener will handle the new role.
+    router.push("/dashboard/admin");
   };
 
   if (isUserLoading) {

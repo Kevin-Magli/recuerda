@@ -4,7 +4,9 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { MessageSquare, Send } from 'lucide-react';
-import { doc } from 'firebase/firestore';
+import { doc, onSnapshot, getDoc } from 'firebase/firestore';
+import { getApps, getApp } from "firebase/app";
+import { useEffect } from 'react';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -75,13 +77,64 @@ export default function MemorialPage() {
   );
 
   const { data: memorial, isLoading, error } = useDoc<Memorial>(memorialRef);
+  
+  useEffect(() => {
+    if (!params.id || !firestore) return;
 
-  if (isLoading) {
-    return <MemorialPageSkeleton />;
-  }
+    console.log('--- Debug memorial page mount ---');
+    console.log('params.id', params.id);
+    console.log('Firebase apps:', getApps().map(a => ({ name: a.name, projectId: a.options?.projectId })));
+    try { console.log('getApp().options', getApp().options) } catch(e) { console.warn('no app ready', e) }
 
+    // quick getDoc test
+    (async () => {
+      try {
+        const snap = await getDoc(doc(firestore, 'memorials', params.id as string));
+        console.log('getDoc result exists?', snap.exists(), snap.data && snap.data());
+      } catch (err) {
+        console.error('getDoc error', err);
+      }
+    })();
+
+    const unsubscribe = onSnapshot(
+      doc(firestore, 'memorials', params.id as string),
+      snapshot => {
+        console.log('onSnapshot snapshot: exists?', snapshot.exists());
+        if (snapshot.exists()) {
+          console.log('snapshot data', snapshot.data());
+        } else {
+          console.log('snapshot no doc');
+        }
+      },
+      err => {
+        console.error('onSnapshot error callback', err);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [params.id, firestore]);
+
+
+  if (isLoading) return <MemorialPageSkeleton />;
+  
+  if (error) return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Erro!</h1>
+      <pre className="bg-muted p-4 rounded-md">{String(error)}</pre>
+    </div>
+  );
+  
   if (!memorial) {
-    return notFound();
+    return (
+      <div className="p-8">
+        <h2 className="text-2xl font-bold mb-4">Memorial não encontrado (debug)</h2>
+        <pre className="bg-muted p-4 rounded-md">
+          <p><strong>params.id:</strong> {params?.id}</p>
+          <p><strong>memorial (JSON):</strong> {JSON.stringify(memorial)}</p>
+        </pre>
+        <p className="mt-4">Verifique o console do navegador e a aba "Network" para mais detalhes.</p>
+      </div>
+    );
   }
 
   return (
@@ -156,7 +209,7 @@ export default function MemorialPage() {
                   <CardTitle className="font-headline text-2xl">Tributes</CardTitle>
                 </div>
                 <CardDescription>Share a memory or leave a message of support.</CardDescription>
-              </CardHeader>
+              </Header>
               <CardContent>
                 <form className="space-y-4">
                   <Input placeholder="Your Name" className="rounded-xl" />

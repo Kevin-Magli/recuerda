@@ -1,13 +1,8 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  // Keeping this config minimal to ensure default App Router behavior.
+  // Removed experimental flags that might conflict with dynamic routing.
   images: {
     remotePatterns: [
       {

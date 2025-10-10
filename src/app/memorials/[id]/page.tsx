@@ -67,18 +67,13 @@ const MemorialPageSkeleton = () => (
 export default function MemorialPage() {
   const params = useParams();
   const memorialId = params.id as string;
-  console.log("[Debug] Memorial ID from URL:", memorialId);
   const firestore = useFirestore();
 
   const memorialRef = useMemoFirebase(
     () => {
-      console.log("[Debug] Creating Firestore document reference for memorialId:", memorialId);
       if (firestore && memorialId) {
-        const ref = doc(firestore, 'memorials', memorialId);
-        console.log("[Debug] Firestore ref created:", ref.path);
-        return ref;
+        return doc(firestore, 'memorials', memorialId);
       }
-      console.log("[Debug] Firestore or memorialId not available. Returning null.");
       return null;
     },
     [firestore, memorialId]
@@ -86,14 +81,7 @@ export default function MemorialPage() {
 
   const { data: memorial, isLoading, error } = useDoc<MemorialData>(memorialRef);
   
-  useEffect(() => {
-    console.log("[Debug] useDoc hook state:", {
-      isLoading,
-      error: error ? { message: error.message, stack: error.stack } : null,
-      data: memorial,
-    });
-  }, [memorial, isLoading, error]);
-  
+  // Show a loading state while data is being fetched.
   if (isLoading) {
     return (
       <>
@@ -107,12 +95,37 @@ export default function MemorialPage() {
     );
   }
 
-  if (!memorial && !isLoading) {
-    console.error("[Debug] Condition met: !memorial && !isLoading. Calling notFound().");
-    notFound();
+  // If there's an error, display it for debugging.
+  if (error) {
+    return (
+      <>
+        <Header />
+        <div className="container py-16">
+          <h1 className="text-2xl font-bold">An Error Occurred</h1>
+          <pre className="mt-4 bg-gray-100 p-4 rounded-md">
+            <code>{JSON.stringify(error, null, 2)}</code>
+          </pre>
+        </div>
+        <Footer />
+      </>
+    );
   }
-  
-  if (!memorial) return null;
+
+  // If loading is finished and there's still no data, then the document doesn't exist.
+  // We are temporarily disabling notFound() to debug.
+  if (!memorial) {
+     return (
+      <>
+        <Header />
+        <div className="container py-16 text-center">
+          <h1 className="text-2xl font-bold">Memorial Not Found</h1>
+          <p className="text-muted-foreground mt-2">No memorial was found for the ID: {memorialId}</p>
+          <p className="text-sm mt-4">This could be because of a data fetching issue or incorrect Firestore rules.</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
 
   return (

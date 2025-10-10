@@ -66,9 +66,11 @@ export default function DashboardPage() {
             Manage and create new memorial pages.
           </p>
         </div>
-        <Button className="rounded-[30px] bg-gradient-to-br from-primary to-accent text-primary-foreground">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create Memorial
+        <Button asChild className="rounded-[30px] bg-gradient-to-br from-primary to-accent text-primary-foreground">
+          <Link href="/dashboard/create">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Memorial
+          </Link>
         </Button>
       </div>
 
@@ -89,7 +91,7 @@ export default function DashboardPage() {
                        <Image
                         src={memorial.profileImage.url}
                         alt={memorial.name}
-                        layout="fill"
+                        fill
                         objectFit="cover"
                         data-ai-hint={memorial.profileImage.hint}
                       />
@@ -118,12 +120,12 @@ export default function DashboardPage() {
               </Card>
             ))}
             
-            <div className="flex items-center justify-center rounded-[30px] border-2 border-dashed p-6">
-              <Button variant="outline" className="w-full h-full flex-col gap-2">
-                <PlusCircle className="h-8 w-8 text-muted-foreground" />
+            <Link href="/dashboard/create" className="flex items-center justify-center rounded-[30px] border-2 border-dashed p-6 hover:bg-muted/50 transition-colors">
+              <div className="text-center">
+                <PlusCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                 <span className="text-muted-foreground">Create a new memorial</span>
-              </Button>
-            </div>
+              </div>
+            </Link>
           </>
         )}
       </div>

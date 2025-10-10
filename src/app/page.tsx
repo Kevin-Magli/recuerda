@@ -8,7 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { CheckCircle, Heart, Lock, Share2 } from 'lucide-react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { collection } from 'firebase/firestore';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Memorial } from '@/lib/definitions';
@@ -47,7 +47,8 @@ export default function Home() {
   
   const memorialsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    return collection(firestore, 'memorials');
+    // Query the top-level 'memorials' collection, ordered by creation and limited.
+    return query(collection(firestore, 'memorials'), orderBy('createdAt', 'desc'), limit(8));
   }, [firestore]);
 
   const { data: memorials, isLoading } = useCollection<Memorial>(memorialsQuery);
@@ -104,7 +105,7 @@ export default function Home() {
                   <MemorialCardSkeleton />
                 </>
               ): (
-                memorials && memorials.slice(0, 8).map((memorial) => (
+                memorials && memorials.map((memorial) => (
                   <Link href={`/memorials/${memorial.id}`} key={memorial.id}>
                     <Card className="overflow-hidden rounded-[30px] transition-transform duration-300 hover:scale-105 hover:shadow-xl h-full flex flex-col">
                       <div className="relative h-64 w-full bg-secondary">

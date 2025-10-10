@@ -49,7 +49,7 @@
         },
         "authorId": {
           "type": "string",
-          "description": "The UID of the User who created the memorial page. (Relationship: User 1:N MemorialPage)"
+          "description": "The UID of the User who created the memorial page."
         },
         "name": {
           "type": "string",
@@ -89,13 +89,7 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information. This collection uses path-based ownership for private user data.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the user."
-            }
-          ]
+          "description": "Stores user profile information. This collection uses path-based ownership for private user data."
         }
       },
       {
@@ -105,13 +99,7 @@
           "schema": {
             "$ref": "#/backend/entities/MemorialPage"
           },
-          "description": "Stores all memorial pages. Pages are public to read, but only the author can write/delete.",
-          "params": [
-            {
-              "name": "memorialId",
-              "description": "The unique identifier for the memorial page."
-            }
-          ]
+          "description": "Stores all memorial pages. Pages are public to read, but only the author can write/delete."
         }
       },
       {
@@ -121,13 +109,7 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Collection to store admin roles. The existence of a document with a user ID in this collection grants admin privileges. Uses 'Existence over Content'.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier for the admin user."
-            }
-          ]
+          "description": "Collection to store admin roles. The existence of a document with a user ID in this collection grants admin privileges. Uses 'Existence over Content'."
         }
       }
     ],

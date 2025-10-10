@@ -29,7 +29,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { Memorial } from "@/lib/definitions"
 
-
 const MemorialSkeleton = () => (
   <Card className="rounded-[30px] overflow-hidden">
     <CardHeader className="p-0">
@@ -56,6 +55,7 @@ export default function DashboardPage() {
   const [memorialToDelete, setMemorialToDelete] = useState<Memorial | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Query the top-level 'memorials' collection, filtering by authorId
   const memorialsQuery = useMemoFirebase(() => {
     if (!user || !firestore) return null
     return query(collection(firestore, "memorials"), where("authorId", "==", user.uid));
@@ -94,7 +94,6 @@ export default function DashboardPage() {
       setMemorialToDelete(null);
     }
   };
-
 
   return (
     <>

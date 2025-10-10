@@ -47,7 +47,7 @@ export default function CreateMemorialPage() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) {
+    if (!user || !firestore) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -57,13 +57,11 @@ export default function CreateMemorialPage() {
     }
 
     try {
-      const memorialCollectionRef = collection(
-        firestore,
-        "memorials"
-      )
+      // Save to the top-level 'memorials' collection
+      const memorialCollectionRef = collection(firestore, "memorials")
 
       await addDoc(memorialCollectionRef, {
-        authorId: user.uid,
+        authorId: user.uid, // Add authorId to link memorial to the user
         name: values.name,
         lifeSpan: values.lifeSpan,
         createdAt: serverTimestamp(),

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useParams, notFound } from 'next/navigation';
@@ -60,6 +59,7 @@ export default function MemorialPage() {
   const memorialId = params.id as string;
   const firestore = useFirestore();
 
+  // Reference the document in the top-level 'memorials' collection
   const memorialRef = useMemoFirebase(
     () => {
       if (firestore && memorialId) {
@@ -84,15 +84,19 @@ export default function MemorialPage() {
       </>
     );
   }
-
+  
+  // If there's an error after loading, show it for debugging.
+  // This helps identify permissions issues.
   if (error) {
+    console.error("Firebase Error:", error);
     return (
       <>
         <Header />
         <main className="container py-12">
           <h1 className="text-2xl font-bold">An Error Occurred</h1>
+          <p className="mt-2 text-muted-foreground">There was an issue loading the memorial. Check the console for details.</p>
           <pre className="mt-4 p-4 bg-muted rounded-lg whitespace-pre-wrap">
-            {JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}
+            {error.message}
           </pre>
         </main>
         <Footer />
@@ -100,19 +104,9 @@ export default function MemorialPage() {
     )
   }
 
+  // If loading is finished and there's no data, trigger a 404.
   if (!memorial) {
-    // Temporarily disabled for debugging. Instead of 404, show a message.
-    // notFound();
-     return (
-      <>
-        <Header />
-        <main className="container py-12 text-center">
-          <h1 className="text-2xl font-bold">Memorial Not Found</h1>
-          <p className="mt-2 text-muted-foreground">The document with ID '{memorialId}' could not be loaded, but no error was reported.</p>
-        </main>
-        <Footer />
-      </>
-    );
+    notFound();
   }
 
   return (
@@ -120,15 +114,17 @@ export default function MemorialPage() {
       <Header />
       <div className="bg-muted/30">
         <section className="relative h-[60vh] min-h-[400px] w-full text-white">
-          <Image
-            src={memorial.profileImage!.url}
-            alt={`A portrait of ${memorial.name}`}
-            fill
-            objectFit="cover"
-            className="z-0"
-            data-ai-hint={memorial.profileImage!.hint}
-            priority
-          />
+          {memorial.profileImage?.url && (
+            <Image
+                src={memorial.profileImage.url}
+                alt={`A portrait of ${memorial.name}`}
+                fill
+                objectFit="cover"
+                className="z-0"
+                data-ai-hint={memorial.profileImage.hint}
+                priority
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent z-10" />
           <div className="container relative z-20 flex h-full flex-col items-start justify-end pb-16">
             <h1 className="font-headline text-5xl font-bold drop-shadow-lg sm:text-6xl md:text-7xl">

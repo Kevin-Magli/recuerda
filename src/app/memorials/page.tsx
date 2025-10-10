@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { collection } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore'; // Import orderBy
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/header';
@@ -26,7 +26,8 @@ export default function MemorialsPage() {
 
   const memorialsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    return collection(firestore, 'memorials');
+    // Query the top-level 'memorials' collection and order by creation date
+    return query(collection(firestore, 'memorials'), orderBy('createdAt', 'desc'));
   }, [firestore]);
 
   const { data: memorials, isLoading } = useCollection<Memorial>(memorialsQuery);
@@ -70,8 +71,7 @@ export default function MemorialsPage() {
                       )}
                     </div>
                     <CardHeader>
-                      <CardTitle className="font-headline text-xl">{memorial.name}</CardTitle>
-                      <CardDescription>{memorial.lifeSpan}</CardDescription>
+                      <CardTitle className="font-headline text-xl">{memorial.name}</CardTitle>                      <CardDescription>{memorial.lifeSpan}</CardDescription>
                     </CardHeader>
                   </Card>
                 </Link>

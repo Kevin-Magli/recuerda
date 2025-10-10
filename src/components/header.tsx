@@ -9,6 +9,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { cn } from '@/lib/utils';
@@ -117,6 +120,10 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[80vw] bg-background">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Mobile Menu</SheetTitle>
+                  <SheetDescription>Main navigation links for the website.</SheetDescription>
+                </SheetHeader>
                 <div className="p-4">
                   <div className="mb-8 flex justify-between">
                      <Logo />

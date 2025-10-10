@@ -28,7 +28,7 @@ const MemorialPageSkeleton = () => (
           <CardHeader>
             <Skeleton className="h-8 w-1/2" />
           </CardHeader>
-          <CardContent className="space-y-2">
+          <CardContent>
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-3/4" />
@@ -70,7 +70,7 @@ export default function MemorialPage() {
     [firestore, memorialId]
   );
 
-  const { data: memorial, isLoading } = useDoc<Memorial>(memorialRef);
+  const { data: memorial, isLoading, error } = useDoc<Memorial>(memorialRef);
   
   if (isLoading) {
     return (
@@ -85,8 +85,34 @@ export default function MemorialPage() {
     );
   }
 
+  if (error) {
+    return (
+      <>
+        <Header />
+        <main className="container py-12">
+          <h1 className="text-2xl font-bold">An Error Occurred</h1>
+          <pre className="mt-4 p-4 bg-muted rounded-lg whitespace-pre-wrap">
+            {JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}
+          </pre>
+        </main>
+        <Footer />
+      </>
+    )
+  }
+
   if (!memorial) {
-    notFound();
+    // Temporarily disabled for debugging. Instead of 404, show a message.
+    // notFound();
+     return (
+      <>
+        <Header />
+        <main className="container py-12 text-center">
+          <h1 className="text-2xl font-bold">Memorial Not Found</h1>
+          <p className="mt-2 text-muted-foreground">The document with ID '{memorialId}' could not be loaded, but no error was reported.</p>
+        </main>
+        <Footer />
+      </>
+    );
   }
 
   return (

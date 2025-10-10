@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams, notFound } from 'next/navigation';
@@ -13,6 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect } from 'react';
 
 
 type MemorialData = {
@@ -65,14 +67,32 @@ const MemorialPageSkeleton = () => (
 export default function MemorialPage() {
   const params = useParams();
   const memorialId = params.id as string;
+  console.log("[Debug] Memorial ID from URL:", memorialId);
   const firestore = useFirestore();
 
   const memorialRef = useMemoFirebase(
-    () => (firestore && memorialId ? doc(firestore, 'memorials', memorialId) : null),
+    () => {
+      console.log("[Debug] Creating Firestore document reference for memorialId:", memorialId);
+      if (firestore && memorialId) {
+        const ref = doc(firestore, 'memorials', memorialId);
+        console.log("[Debug] Firestore ref created:", ref.path);
+        return ref;
+      }
+      console.log("[Debug] Firestore or memorialId not available. Returning null.");
+      return null;
+    },
     [firestore, memorialId]
   );
 
   const { data: memorial, isLoading, error } = useDoc<MemorialData>(memorialRef);
+  
+  useEffect(() => {
+    console.log("[Debug] useDoc hook state:", {
+      isLoading,
+      error: error ? { message: error.message, stack: error.stack } : null,
+      data: memorial,
+    });
+  }, [memorial, isLoading, error]);
   
   if (isLoading) {
     return (
@@ -88,6 +108,7 @@ export default function MemorialPage() {
   }
 
   if (!memorial && !isLoading) {
+    console.error("[Debug] Condition met: !memorial && !isLoading. Calling notFound().");
     notFound();
   }
   

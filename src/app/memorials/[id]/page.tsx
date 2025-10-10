@@ -1,8 +1,8 @@
+
 "use client";
 
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
 import { MessageSquare, Send } from 'lucide-react';
 import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { getApps, getApp } from "firebase/app";
@@ -115,14 +115,18 @@ export default function MemorialPage() {
   }, [params.id, firestore]);
 
 
-  if (isLoading) return <MemorialPageSkeleton />;
+  if (isLoading) {
+    return <MemorialPageSkeleton />;
+  }
   
-  if (error) return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Erro!</h1>
-      <pre className="bg-muted p-4 rounded-md">{String(error)}</pre>
-    </div>
-  );
+  if (error) {
+    return (
+        <div className="p-8">
+            <h1 className="text-2xl font-bold mb-4">Erro!</h1>
+            <pre className="bg-muted p-4 rounded-md">{String(error)}</pre>
+        </div>
+    );
+  }
   
   if (!memorial) {
     return (
@@ -130,7 +134,7 @@ export default function MemorialPage() {
         <h2 className="text-2xl font-bold mb-4">Memorial não encontrado (debug)</h2>
         <pre className="bg-muted p-4 rounded-md">
           <p><strong>params.id:</strong> {params?.id}</p>
-          <p><strong>memorial (JSON):</strong> {JSON.stringify(memorial)}</p>
+          <p><strong>memorial (from useDoc):</strong> {JSON.stringify(memorial)}</p>
         </pre>
         <p className="mt-4">Verifique o console do navegador e a aba "Network" para mais detalhes.</p>
       </div>
@@ -209,7 +213,7 @@ export default function MemorialPage() {
                   <CardTitle className="font-headline text-2xl">Tributes</CardTitle>
                 </div>
                 <CardDescription>Share a memory or leave a message of support.</CardDescription>
-              </Header>
+              </CardHeader>
               <CardContent>
                 <form className="space-y-4">
                   <Input placeholder="Your Name" className="rounded-xl" />

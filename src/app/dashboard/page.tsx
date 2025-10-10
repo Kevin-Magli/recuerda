@@ -49,7 +49,7 @@ export default function DashboardPage() {
   const firestore = useFirestore()
 
   const memorialsQuery = useMemoFirebase(() => {
-    if (!user) return null
+    if (!user || !firestore) return null
     // Query the top-level 'memorials' collection
     // and filter by the 'authorId' to get only the memorials
     // created by the current user.

@@ -1,7 +1,10 @@
-import { notFound } from 'next/navigation';
+"use client";
+
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Heart, MessageSquare, Send } from 'lucide-react';
-import { memorials } from '@/lib/data';
+import { doc } from 'firebase/firestore';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,25 +12,87 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import { Skeleton } from '@/components/ui/skeleton';
+import { notFound } from 'next/navigation';
 
-type MemorialPageProps = {
-  params: {
-    slug: string;
-  };
+type MemorialData = {
+  name: string;
+  lifeSpan: string;
+  profileImage: { url: string; hint: string };
+  bio?: string;
+  gallery?: { id: string; url: string; hint: string }[];
+  tributes?: { id: string; author: string; message: string; date: string }[];
 };
 
-export async function generateStaticParams() {
-  return memorials.map((memorial) => ({
-    slug: memorial.slug,
-  }));
-}
+const MemorialPageSkeleton = () => (
+  <>
+    <div className="relative h-[60vh] min-h-[400px] w-full bg-secondary">
+      <Skeleton className="h-full w-full" />
+    </div>
+    <div className="container -mt-10 relative z-30 grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="lg:col-span-2 space-y-8">
+        <Card className="rounded-[30px] shadow-lg">
+          <CardHeader>
+            <Skeleton className="h-8 w-1/2" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </CardContent>
+        </Card>
+      </div>
+      <div className="lg:col-span-1">
+        <Card className="rounded-[30px] shadow-lg sticky top-24">
+          <CardHeader>
+            <Skeleton className="h-8 w-1/3" />
+            <Skeleton className="h-4 w-2/3" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </>
+);
 
-export default function MemorialPage({ params }: MemorialPageProps) {
-  const memorial = memorials.find((m) => m.slug === params.slug);
 
-  if (!memorial) {
+export default function MemorialPage() {
+  const params = useParams();
+  const memorialId = params.id as string;
+  const firestore = useFirestore();
+
+  const memorialRef = useMemoFirebase(
+    () => (firestore && memorialId ? doc(firestore, 'memorials', memorialId) : null),
+    [firestore, memorialId]
+  );
+
+  const { data: memorial, isLoading, error } = useDoc<MemorialData>(memorialRef);
+  
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <div className="bg-muted/30">
+            <MemorialPageSkeleton />
+            <div className="py-8"></div>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!memorial && !isLoading) {
     notFound();
   }
+  
+  if (!memorial) return null;
+
 
   return (
     <>
@@ -59,7 +124,7 @@ export default function MemorialPage({ params }: MemorialPageProps) {
                 <CardTitle className="font-headline text-2xl">Biography</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="whitespace-pre-wrap text-muted-foreground">{memorial.bio}</p>
+                <p className="whitespace-pre-wrap text-muted-foreground">{memorial.bio || 'No biography has been added yet.'}</p>
               </CardContent>
             </Card>
 
@@ -69,20 +134,24 @@ export default function MemorialPage({ params }: MemorialPageProps) {
                 <CardDescription>A collection of cherished moments.</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {memorial.gallery.map((image) => (
-                    <div key={image.id} className="relative aspect-w-1 aspect-h-1 overflow-hidden rounded-lg">
-                      <Image
-                        src={image.url}
-                        alt="Gallery image"
-                        fill
-                        objectFit="cover"
-                        className="transition-transform duration-300 hover:scale-110"
-                        data-ai-hint={image.hint}
-                      />
+                {memorial.gallery && memorial.gallery.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                    {memorial.gallery.map((image) => (
+                        <div key={image.id} className="relative aspect-w-1 aspect-h-1 overflow-hidden rounded-lg">
+                        <Image
+                            src={image.url}
+                            alt="Gallery image"
+                            fill
+                            objectFit="cover"
+                            className="transition-transform duration-300 hover:scale-110"
+                            data-ai-hint={image.hint}
+                        />
+                        </div>
+                    ))}
                     </div>
-                  ))}
-                </div>
+                ) : (
+                    <p className="text-center text-sm text-muted-foreground py-8">The gallery is empty.</p>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -107,7 +176,7 @@ export default function MemorialPage({ params }: MemorialPageProps) {
                 </form>
                 <Separator className="my-6" />
                 <div className="space-y-6 max-h-96 overflow-y-auto pr-2">
-                  {memorial.tributes.map((tribute) => (
+                  {memorial.tributes && memorial.tributes.length > 0 ? memorial.tributes.map((tribute) => (
                     <div key={tribute.id} className="flex flex-col">
                       <div className="flex items-center justify-between">
                         <p className="font-semibold">{tribute.author}</p>
@@ -115,8 +184,7 @@ export default function MemorialPage({ params }: MemorialPageProps) {
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{tribute.message}</p>
                     </div>
-                  ))}
-                  {memorial.tributes.length === 0 && (
+                  )) : (
                     <p className="text-center text-sm text-muted-foreground">Be the first to leave a tribute.</p>
                   )}
                 </div>

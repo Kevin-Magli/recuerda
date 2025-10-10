@@ -47,17 +47,17 @@
           "type": "string",
           "description": "Unique identifier for the memorial page."
         },
-        "userId": {
+        "authorId": {
           "type": "string",
-          "description": "Reference to the User who created the memorial page. (Relationship: User 1:N MemorialPage)"
+          "description": "The UID of the User who created the memorial page. (Relationship: User 1:N MemorialPage)"
         },
-        "title": {
+        "name": {
           "type": "string",
-          "description": "Title of the memorial page."
+          "description": "The name of the person being memorialized."
         },
-        "description": {
+        "lifeSpan": {
           "type": "string",
-          "description": "Description or summary of the memorial page content."
+          "description": "The life span of the person (e.g., 1950 - 2024)."
         },
         "createdAt": {
           "type": "string",
@@ -67,9 +67,9 @@
       },
       "required": [
         "id",
-        "userId",
-        "title",
-        "description",
+        "authorId",
+        "name",
+        "lifeSpan",
         "createdAt"
       ]
     }
@@ -99,20 +99,16 @@
         }
       },
       {
-        "path": "/users/{userId}/memorialPages/{memorialPageId}",
+        "path": "/memorials/{memorialId}",
         "definition": {
           "entityName": "MemorialPage",
           "schema": {
             "$ref": "#/backend/entities/MemorialPage"
           },
-          "description": "Stores memorial pages created by users. This collection uses path-based ownership. The 'userId' is duplicated from the parent document for Authorization Independence.",
+          "description": "Stores all memorial pages. Pages are public to read, but only the author can write/delete.",
           "params": [
             {
-              "name": "userId",
-              "description": "The unique identifier for the user who owns the memorial page."
-            },
-            {
-              "name": "memorialPageId",
+              "name": "memorialId",
               "description": "The unique identifier for the memorial page."
             }
           ]
@@ -135,6 +131,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure Authorization Independence, DBAC (Database-Based Access Control), and simple, secure rules. User data is stored in `/users/{userId}` with the profile information. Memorial pages are stored in `/users/{userId}/memorialPages/{memorialPageId}` to establish clear ownership. An admin role is managed through the `/roles_admin/{userId}` collection. The existence of a document in this collection grants admin privileges, following the principle of 'Existence over Content'. This approach avoids complex `get()` calls in security rules, supporting atomic operations and easy debugging. It also enables simple `list` operations. The structure strictly separates different types of data, ensuring a homogeneous security posture for each collection. All documents in a collection share the same security requirements."
+    "reasoning": "The Firestore structure is designed for scalability and clear access patterns. User data is private in `/users/{userId}`. Memorials are in a top-level `/memorials` collection to allow for public read access, which is crucial for sharing memorial pages. Write access to a specific memorial is controlled by checking the `authorId` field against the requesting user's UID in the security rules. Admin roles are managed via document existence in `/roles_admin/{userId}` for efficient role checking without needing a `get()` call in security rules. This structure separates concerns, simplifies security rules, and supports both private user data and public content efficiently."
   }
 }

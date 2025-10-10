@@ -3,7 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { PlusCircle, Edit, Trash2 } from "lucide-react"
-import { collection } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 
 import { useCollection, useFirestore, useUser, useMemoFirebase } from "@/firebase"
 import { Button } from "@/components/ui/button"
@@ -50,7 +50,10 @@ export default function DashboardPage() {
 
   const memorialsQuery = useMemoFirebase(() => {
     if (!user) return null
-    return collection(firestore, "users", user.uid, "memorialPages")
+    // Query the top-level 'memorials' collection
+    // and filter by the 'authorId' to get only the memorials
+    // created by the current user.
+    return query(collection(firestore, "memorials"), where("authorId", "==", user.uid));
   }, [firestore, user])
 
   const { data: userMemorials, isLoading } = useCollection<Memorial>(memorialsQuery);

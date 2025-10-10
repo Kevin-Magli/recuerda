@@ -59,12 +59,11 @@ export default function CreateMemorialPage() {
     try {
       const memorialCollectionRef = collection(
         firestore,
-        "users",
-        user.uid,
-        "memorialPages"
+        "memorials"
       )
 
       await addDoc(memorialCollectionRef, {
+        authorId: user.uid,
         name: values.name,
         lifeSpan: values.lifeSpan,
         createdAt: serverTimestamp(),

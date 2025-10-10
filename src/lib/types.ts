@@ -1,9 +1,6 @@
 export type Memorial = {
   id: string;
-  slug: string;
   name: string;
-  birthDate: string;
-  deathDate: string;
   lifeSpan: string;
   profileImage: {
     id: string,

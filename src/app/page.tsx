@@ -11,16 +11,7 @@ import { Footer } from '@/components/footer';
 import { collection } from 'firebase/firestore';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-
-type Memorial = {
-  id: string;
-  name: string;
-  lifeSpan: string;
-  profileImage?: {
-    url: string;
-    hint: string;
-  };
-};
+import { Memorial } from '@/lib/definitions';
 
 const features = [
   {
@@ -176,7 +167,7 @@ export default function Home() {
                   <CardTitle className="font-headline text-2xl">Free</CardTitle>
                   <CardDescription>A simple, beautiful memorial.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow flex flex-col">
+                <CardContent>
                   <div className="text-4xl font-bold text-center mb-6">$0 <span className="text-lg font-normal text-muted-foreground">/ forever</span></div>
                   <ul className="space-y-3 text-muted-foreground">
                     <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-primary" /> Up to 25 photos</li>
@@ -195,7 +186,7 @@ export default function Home() {
                   <CardTitle className="font-headline text-2xl">Subscriber</CardTitle>
                   <CardDescription>More features and customization.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow flex flex-col">
+                <CardContent>
                   <div className="text-4xl font-bold text-center mb-6">$49 <span className="text-lg font-normal text-muted-foreground">/ one-time</span></div>
                   <ul className="space-y-3 text-muted-foreground">
                     <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-primary" /> Everything in Free</li>
@@ -212,7 +203,7 @@ export default function Home() {
                   <CardTitle className="font-headline text-2xl">Funeral Home</CardTitle>
                   <CardDescription>For our professional partners.</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow flex flex-col">
+                <CardContent>
                   <div className="text-4xl font-bold text-center mb-6">Partner</div>
                   <ul className="space-y-3 text-muted-foreground">
                     <li className="flex items-center gap-2"><CheckCircle className="h-5 w-5 text-primary" /> Bulk memorial creation</li>

@@ -8,16 +8,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Skeleton } from '@/components/ui/skeleton';
-
-type Memorial = {
-  id: string
-  name: string
-  lifeSpan: string
-  profileImage?: {
-    url: string
-    hint: string
-  }
-};
+import { Memorial } from '@/lib/definitions';
 
 const MemorialCardSkeleton = () => (
   <Card className="overflow-hidden rounded-[30px] h-full flex flex-col">

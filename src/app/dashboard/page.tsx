@@ -27,16 +27,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
-
-type Memorial = {
-  id: string
-  name: string
-  lifeSpan: string
-  profileImage?: {
-    url: string
-    hint: string
-  }
-};
+import { Memorial } from "@/lib/definitions"
 
 
 const MemorialSkeleton = () => (

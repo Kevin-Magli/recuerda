@@ -7,6 +7,7 @@ import {
   Settings,
   User as UserIcon,
   Shield,
+  Loader2
 } from "lucide-react"
 import { usePathname, useRouter } from 'next/navigation'
 import { getAuth, signOut } from "firebase/auth"
@@ -46,7 +47,7 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const router = useRouter()
   const isActive = (path: string) => pathname === path
-  const { user, isAdmin } = useUser()
+  const { user, isAdmin, isUserLoading } = useUser()
   const auth = getAuth()
 
   const handleLogout = async () => {
@@ -54,8 +55,26 @@ export default function DashboardLayout({
     router.push("/")
   }
 
+  if (isUserLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
   if (!user) {
-    return null;
+    // This can happen briefly on logout before redirect.
+    // Or if a non-logged-in user tries to access /dashboard directly.
+    if (typeof window !== 'undefined') {
+      router.push('/login');
+    }
+    return (
+        <div className="flex h-screen w-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="ml-2">Redirecting to login...</p>
+        </div>
+    );
   }
 
   return (

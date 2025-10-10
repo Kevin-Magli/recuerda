@@ -3,7 +3,7 @@
 
 import { useParams, notFound } from 'next/navigation';
 import Image from 'next/image';
-import { Heart, MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
 import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,17 +14,8 @@ import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { Memorial } from '@/lib/definitions';
 
-
-type MemorialData = {
-  name: string;
-  lifeSpan: string;
-  profileImage: { url: string; hint: string };
-  bio?: string;
-  gallery?: { id: string; url: string; hint: string }[];
-  tributes?: { id: string; author: string; message: string; date: string }[];
-};
 
 const MemorialPageSkeleton = () => (
   <>
@@ -79,9 +70,8 @@ export default function MemorialPage() {
     [firestore, memorialId]
   );
 
-  const { data: memorial, isLoading, error } = useDoc<MemorialData>(memorialRef);
+  const { data: memorial, isLoading } = useDoc<Memorial>(memorialRef);
   
-  // Show a loading state while data is being fetched.
   if (isLoading) {
     return (
       <>
@@ -95,38 +85,9 @@ export default function MemorialPage() {
     );
   }
 
-  // If there's an error, display it for debugging.
-  if (error) {
-    return (
-      <>
-        <Header />
-        <div className="container py-16">
-          <h1 className="text-2xl font-bold">An Error Occurred</h1>
-          <pre className="mt-4 bg-gray-100 p-4 rounded-md">
-            <code>{JSON.stringify(error, null, 2)}</code>
-          </pre>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
-  // If loading is finished and there's still no data, then the document doesn't exist.
-  // We are temporarily disabling notFound() to debug.
   if (!memorial) {
-     return (
-      <>
-        <Header />
-        <div className="container py-16 text-center">
-          <h1 className="text-2xl font-bold">Memorial Not Found</h1>
-          <p className="text-muted-foreground mt-2">No memorial was found for the ID: {memorialId}</p>
-          <p className="text-sm mt-4">This could be because of a data fetching issue or incorrect Firestore rules.</p>
-        </div>
-        <Footer />
-      </>
-    );
+    notFound();
   }
-
 
   return (
     <>
@@ -134,12 +95,12 @@ export default function MemorialPage() {
       <div className="bg-muted/30">
         <section className="relative h-[60vh] min-h-[400px] w-full text-white">
           <Image
-            src={memorial.profileImage.url}
+            src={memorial.profileImage!.url}
             alt={`A portrait of ${memorial.name}`}
             fill
             objectFit="cover"
             className="z-0"
-            data-ai-hint={memorial.profileImage.hint}
+            data-ai-hint={memorial.profileImage!.hint}
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent z-10" />

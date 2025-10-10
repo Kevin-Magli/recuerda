@@ -38,6 +38,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
+import { useEffect } from "react"
 
 export default function DashboardLayout({
   children,
@@ -54,26 +55,21 @@ export default function DashboardLayout({
     await signOut(auth)
     router.push("/")
   }
-
-  if (isUserLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
   
-  if (!user) {
-    // This can happen briefly on logout before redirect.
-    // Or if a non-logged-in user tries to access /dashboard directly.
-    if (typeof window !== 'undefined') {
+  useEffect(() => {
+    // If auth has loaded and there's no user, redirect to login.
+    // This prevents showing a brief empty state or error if a non-logged-in user hits the dashboard.
+    if (!isUserLoading && !user) {
       router.push('/login');
     }
+  }, [isUserLoading, user, router]);
+
+
+  if (isUserLoading || !user) {
     return (
-        <div className="flex h-screen w-full items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="ml-2">Redirecting to login...</p>
-        </div>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
   }
 

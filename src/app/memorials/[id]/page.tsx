@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Heart, MessageSquare, Send } from 'lucide-react';
 import { doc } from 'firebase/firestore';
@@ -13,7 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Skeleton } from '@/components/ui/skeleton';
-import { notFound } from 'next/navigation';
+
 
 type MemorialData = {
   name: string;

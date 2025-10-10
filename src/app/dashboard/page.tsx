@@ -87,15 +87,15 @@ export default function DashboardPage() {
       const memorialRef = doc(firestore, "memorials", memorialToDelete.id);
       await deleteDoc(memorialRef);
       toast({
-        title: "Memorial Apagado",
-        description: `O memorial para ${memorialToDelete.name} foi removido.`,
+        title: "Memorial Deleted",
+        description: `The memorial for ${memorialToDelete.name} has been removed.`,
       });
     } catch (error) {
       console.error("Error deleting memorial: ", error);
       toast({
         variant: "destructive",
-        title: "Erro ao Apagar",
-        description: "Não foi possível apagar o memorial. Tente novamente.",
+        title: "Error Deleting",
+        description: "Could not delete the memorial. Please try again.",
       });
     } finally {
       setIsDeleting(false);

@@ -79,7 +79,8 @@ export default function MemorialPage() {
   if (isLoading) {
     return <MemorialPageSkeleton />;
   }
-
+  
+  // Handling error state for debugging purposes
   if (error) {
     return (
       <main className="container py-12">
@@ -91,36 +92,9 @@ export default function MemorialPage() {
     )
   }
 
+  // If loading is finished and there's no data, call notFound()
   if (!memorial) {
-    return (
-      <main className="container py-12">
-        <div className="p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-          <h2 className="text-xl font-bold text-yellow-800">Memorial não encontrado (Debug UI)</h2>
-          <p className="mt-2 text-yellow-700">O hook 'useDoc' terminou de carregar mas não retornou dados. Veja os valores abaixo:</p>
-          <div className="mt-4 space-y-2 p-4 bg-gray-800 text-white rounded-md text-sm">
-            <p>
-              <span className="font-semibold">ID da URL (params.id):</span>
-              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{memorialId || 'Não disponível'}</span>
-            </p>
-             <p>
-              <span className="font-semibold">Caminho da Referência (memorialRef.path):</span>
-              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{memorialRef?.path || 'Referência nula'}</span>
-            </p>
-            <p>
-              <span className="font-semibold">Hook retornou 'memorial':</span>
-              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{JSON.stringify(memorial)}</span>
-            </p>
-            <p>
-              <span className="font-semibold">Hook retornou 'isLoading':</span>
-              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{JSON.stringify(isLoading)}</span>
-            </p>
-          </div>
-          <p className="mt-4 text-yellow-700">
-            <strong>Próximos Passos:</strong> Verifique o console do navegador (F12) e a aba "Network" para ver se há erros do Firestore. Confirme no seu console do Firebase que um documento com o ID acima existe na coleção 'memorials'.
-          </p>
-        </div>
-      </main>
-    );
+    return notFound();
   }
 
   return (

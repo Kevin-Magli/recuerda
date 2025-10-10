@@ -47,12 +47,47 @@ export default function CreateMemorialPage() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Logic will be implemented in the next step
-    console.log("Form submitted with values:", values)
-    toast({
-        title: "In Progress",
-        description: "Form submission logic is not yet implemented.",
-    })
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to create a memorial.",
+      })
+      return
+    }
+
+    try {
+      const memorialCollectionRef = collection(
+        firestore,
+        "users",
+        user.uid,
+        "memorialPages"
+      )
+
+      await addDoc(memorialCollectionRef, {
+        name: values.name,
+        lifeSpan: values.lifeSpan,
+        createdAt: serverTimestamp(),
+        profileImage: {
+          url: `https://picsum.photos/seed/${Math.random()}/600/400`,
+          hint: "placeholder image",
+        },
+      })
+
+      toast({
+        title: "Success!",
+        description: "The memorial page has been created.",
+      })
+
+      router.push("/dashboard")
+    } catch (error) {
+      console.error("Error creating memorial: ", error)
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "Could not create the memorial page. Please try again.",
+      })
+    }
   }
 
   return (

@@ -18,48 +18,52 @@ import { Memorial } from '@/lib/definitions';
 
 const MemorialPageSkeleton = () => (
   <>
-    <div className="relative h-[60vh] min-h-[400px] w-full bg-secondary">
-      <Skeleton className="h-full w-full" />
+    <Header />
+      <div className="bg-muted/30">
+        <div className="relative h-[60vh] min-h-[400px] w-full bg-secondary">
+          <Skeleton className="h-full w-full" />
+        </div>
+        <div className="container -mt-10 relative z-30 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="rounded-[30px] shadow-lg">
+              <CardHeader>
+                <Skeleton className="h-8 w-1/2" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </CardContent>
+            </Card>
+          </div>
+          <div className="lg:col-span-1">
+            <Card className="rounded-[30px] shadow-lg sticky top-24">
+              <CardHeader>
+                <Skeleton className="h-8 w-1/3" />
+                <Skeleton className="h-4 w-2/3" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        <div className="py-8"></div>
     </div>
-    <div className="container -mt-10 relative z-30 grid grid-cols-1 gap-8 lg:grid-cols-3">
-      <div className="lg:col-span-2 space-y-8">
-        <Card className="rounded-[30px] shadow-lg">
-          <CardHeader>
-            <Skeleton className="h-8 w-1/2" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </CardContent>
-        </Card>
-      </div>
-      <div className="lg:col-span-1">
-        <Card className="rounded-[30px] shadow-lg sticky top-24">
-          <CardHeader>
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-4 w-2/3" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-20 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <Footer />
   </>
 );
 
 
 export default function MemorialPage() {
   const params = useParams();
-  const memorialId = params.id as string;
+  const memorialId = params?.id as string;
   const firestore = useFirestore();
 
-  // Reference the document in the top-level 'memorials' collection
   const memorialRef = useMemoFirebase(
     () => {
       if (firestore && memorialId) {
@@ -73,40 +77,50 @@ export default function MemorialPage() {
   const { data: memorial, isLoading, error } = useDoc<Memorial>(memorialRef);
   
   if (isLoading) {
-    return (
-      <>
-        <Header />
-        <div className="bg-muted/30">
-            <MemorialPageSkeleton />
-            <div className="py-8"></div>
-        </div>
-        <Footer />
-      </>
-    );
+    return <MemorialPageSkeleton />;
   }
-  
-  // If there's an error after loading, show it for debugging.
-  // This helps identify permissions issues.
+
   if (error) {
-    console.error("Firebase Error:", error);
     return (
-      <>
-        <Header />
-        <main className="container py-12">
-          <h1 className="text-2xl font-bold">An Error Occurred</h1>
-          <p className="mt-2 text-muted-foreground">There was an issue loading the memorial. Check the console for details.</p>
-          <pre className="mt-4 p-4 bg-muted rounded-lg whitespace-pre-wrap">
-            {error.message}
-          </pre>
-        </main>
-        <Footer />
-      </>
+      <main className="container py-12">
+        <h1 className="text-2xl font-bold">Erro de Depuração</h1>
+        <pre className="mt-4 p-4 bg-red-100 text-red-800 rounded-lg whitespace-pre-wrap">
+          Erro: {String(error)}
+        </pre>
+      </main>
     )
   }
 
-  // If loading is finished and there's no data, trigger a 404.
   if (!memorial) {
-    notFound();
+    return (
+      <main className="container py-12">
+        <div className="p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
+          <h2 className="text-xl font-bold text-yellow-800">Memorial não encontrado (Debug UI)</h2>
+          <p className="mt-2 text-yellow-700">O hook 'useDoc' terminou de carregar mas não retornou dados. Veja os valores abaixo:</p>
+          <div className="mt-4 space-y-2 p-4 bg-gray-800 text-white rounded-md text-sm">
+            <p>
+              <span className="font-semibold">ID da URL (params.id):</span>
+              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{memorialId || 'Não disponível'}</span>
+            </p>
+             <p>
+              <span className="font-semibold">Caminho da Referência (memorialRef.path):</span>
+              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{memorialRef?.path || 'Referência nula'}</span>
+            </p>
+            <p>
+              <span className="font-semibold">Hook retornou 'memorial':</span>
+              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{JSON.stringify(memorial)}</span>
+            </p>
+            <p>
+              <span className="font-semibold">Hook retornou 'isLoading':</span>
+              <span className="ml-2 bg-gray-700 px-2 py-1 rounded">{JSON.stringify(isLoading)}</span>
+            </p>
+          </div>
+          <p className="mt-4 text-yellow-700">
+            <strong>Próximos Passos:</strong> Verifique o console do navegador (F12) e a aba "Network" para ver se há erros do Firestore. Confirme no seu console do Firebase que um documento com o ID acima existe na coleção 'memorials'.
+          </p>
+        </div>
+      </main>
+    );
   }
 
   return (

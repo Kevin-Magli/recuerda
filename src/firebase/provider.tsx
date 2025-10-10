@@ -87,7 +87,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       auth,
       async (firebaseUser) => { 
         if (firebaseUser) {
-          const idTokenResult = await firebaseUser.getIdTokenResult();
+          // Force a token refresh to get the latest claims, especially after a change like becoming admin.
+          const idTokenResult = await firebaseUser.getIdTokenResult(true);
           const claims = idTokenResult.claims as CustomClaims;
           setUserAuthState({ user: firebaseUser, claims: claims, isUserLoading: false, userError: null });
         } else {

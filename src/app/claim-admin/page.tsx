@@ -32,17 +32,18 @@ export default function ClaimAdminPage() {
     const adminRoleRef = doc(firestore, "roles_admin", user.uid);
     const roleData = { grantedAt: new Date().toISOString() };
 
-    // This is now a non-blocking call.
-    // The error will be caught and emitted by setDocumentNonBlocking.
     setDocumentNonBlocking(adminRoleRef, roleData, {});
     
     toast({
-      title: "Processing...",
-      description: "Your request to claim the admin role is being processed. You will be redirected shortly.",
+      title: "Success!",
+      description: "You are now an administrator. Redirecting...",
     });
 
-    // Redirect optimistically. The auth listener will handle the new role.
-    router.push("/dashboard/admin");
+    // Wait a moment for the user to see the toast, then redirect.
+    // The auth listener will handle updating the UI with the new role.
+    setTimeout(() => {
+      router.push("/dashboard/admin");
+    }, 2000);
   };
 
   if (isUserLoading) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { MessageSquare, Send } from 'lucide-react';
 import { doc } from 'firebase/firestore';
@@ -80,21 +80,31 @@ export default function MemorialPage() {
     return <MemorialPageSkeleton />;
   }
   
-  // Handling error state for debugging purposes
   if (error) {
     return (
-      <main className="container py-12">
-        <h1 className="text-2xl font-bold">Erro de Depuração</h1>
-        <pre className="mt-4 p-4 bg-red-100 text-red-800 rounded-lg whitespace-pre-wrap">
-          Erro: {String(error)}
-        </pre>
-      </main>
+        <main className="container py-12">
+            <h1 className="text-2xl font-bold">Erro de Depuração</h1>
+            <pre className="mt-4 p-4 bg-red-100 text-red-800 rounded-lg whitespace-pre-wrap">
+                Erro: {String(error)}
+            </pre>
+        </main>
     )
   }
 
-  // If loading is finished and there's no data, call notFound()
   if (!memorial) {
-    return notFound();
+    return (
+        <main className="container py-12">
+            <div className='p-4 bg-yellow-100 border border-yellow-400 rounded-lg'>
+                <h2 className='text-xl font-bold text-yellow-800'>Memorial não encontrado (Debug)</h2>
+                <p className='mt-2 text-yellow-700'>A página não encontrou os dados para o memorial solicitado. Isso pode acontecer se o ID estiver incorreto ou se os dados ainda não estiverem disponíveis.</p>
+                <div className='mt-4 p-2 bg-gray-800 text-white rounded-md text-sm'>
+                    <pre>ID da URL (params.id): {params?.id ? JSON.stringify(params.id) : "não disponível"}</pre>
+                    <pre>Resultado da busca (memorial): {JSON.stringify(memorial)}</pre>
+                </div>
+                <p className="mt-4 text-sm text-gray-600">Verifique o console do navegador e a aba 'Network' nas ferramentas de desenvolvedor para mais detalhes sobre as requisições ao Firestore.</p>
+            </div>
+      </main>
+    );
   }
 
   return (

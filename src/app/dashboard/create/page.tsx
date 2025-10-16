@@ -24,12 +24,14 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   lifeSpan: z.string().min(4, "Please enter a life span (e.g., 1950 - 2024)."),
+  bio: z.string().optional(),
 })
 
 export default function CreateMemorialPage() {
@@ -43,6 +45,7 @@ export default function CreateMemorialPage() {
     defaultValues: {
       name: "",
       lifeSpan: "",
+      bio: "",
     },
   })
 
@@ -64,6 +67,7 @@ export default function CreateMemorialPage() {
         authorId: user.uid, // Add authorId to link memorial to the user
         name: values.name,
         lifeSpan: values.lifeSpan,
+        bio: values.bio,
         createdAt: serverTimestamp(),
         profileImage: {
           url: `https://picsum.photos/seed/${Math.random()}/600/400`,
@@ -127,6 +131,23 @@ export default function CreateMemorialPage() {
                     <FormLabel>Life Span</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., 1950 - 2024" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Biography</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Share a story about their life..."
+                        className="min-h-[150px]"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -147,9 +147,11 @@ export default function DashboardPage() {
                         View Page
                       </Link>
                     </Button>
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4" />
-                      <span className="sr-only">Edit</span>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href={`/dashboard/edit/${memorial.id}`}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Link>
                     </Button>
                     <Button 
                       variant="ghost" 

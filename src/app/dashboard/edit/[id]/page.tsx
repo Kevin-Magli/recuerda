@@ -105,12 +105,32 @@ export default function EditMemorialPage() {
   }, [memorial, form])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // A lógica de atualização será implementada na próxima micro-tarefa.
-    console.log("Valores do formulário para salvar:", values)
-    toast({
-      title: "Próximo Passo",
-      description: "A lógica para salvar as alterações será implementada a seguir.",
-    })
+    if (!firestore || !memorialId) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not find the necessary memorial information to update.",
+      });
+      return;
+    }
+    
+    const docRef = doc(firestore, "memorials", memorialId);
+
+    try {
+      await updateDoc(docRef, values);
+      toast({
+        title: "Success!",
+        description: "The memorial page has been updated.",
+      });
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Error updating memorial:", error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message || "Could not update the memorial page.",
+      });
+    }
   }
 
   if (isLoading || !memorial) {

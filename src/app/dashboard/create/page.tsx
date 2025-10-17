@@ -63,8 +63,6 @@ export default function CreateMemorialPage() {
     try {
       const memorialCollectionRef = collection(firestore, "memorials")
       const profileImagePlaceholder = PlaceHolderImages.find(p => p.id.startsWith('memorial-'));
-      const galleryPlaceholders = PlaceHolderImages.filter(p => p.id.startsWith('gallery-')).slice(0, 5);
-
 
       await addDoc(memorialCollectionRef, {
         authorId: user.uid,
@@ -79,11 +77,7 @@ export default function CreateMemorialPage() {
           url: `https://picsum.photos/seed/${Math.random()}/600/400`,
           hint: "placeholder image",
         },
-        gallery: galleryPlaceholders.map(p => ({
-          id: p.id,
-          url: p.imageUrl,
-          hint: p.imageHint,
-        })),
+        gallery: [],
       })
 
       toast({

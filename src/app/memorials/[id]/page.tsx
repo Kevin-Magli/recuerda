@@ -145,7 +145,7 @@ export default function MemorialPage() {
                 {memorial.gallery && memorial.gallery.length > 0 ? (
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                     {memorial.gallery.map((image) => (
-                        <div key={image.id} className="relative aspect-w-1 aspect-h-1 overflow-hidden rounded-lg">
+                        <div key={image.id} className="relative aspect-square overflow-hidden rounded-lg">
                         <Image
                             src={image.url}
                             alt="Gallery image"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, ArrowLeft, PlusCircle, Trash2 } from "lucide-react"
+import { Loader2, ArrowLeft, PlusCircle, Trash2, Upload } from "lucide-react"
 import { Memorial } from "@/lib/definitions"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -63,10 +63,6 @@ const EditPageSkeleton = () => (
                     <Skeleton className="h-4 w-16" />
                     <Skeleton className="h-24 w-full" />
                 </div>
-                <div className="flex justify-end gap-2">
-                    <Skeleton className="h-10 w-24 rounded-[30px]" />
-                    <Skeleton className="h-10 w-28 rounded-[30px]" />
-                </div>
             </CardContent>
         </Card>
     </div>
@@ -79,6 +75,10 @@ export default function EditMemorialPage() {
   const { toast } = useToast()
   const firestore = useFirestore()
   const memorialId = params?.id as string
+
+  const [isUploading, setIsUploading] = useState(false);
+  const profileFileInputRef = useRef<HTMLInputElement>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
 
   const memorialRef = useMemoFirebase(
     () => (firestore && memorialId ? doc(firestore, "memorials", memorialId) : null),
@@ -105,6 +105,48 @@ export default function EditMemorialPage() {
       })
     }
   }, [memorial, form])
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'gallery') => {
+    const file = event.target.files?.[0];
+    if (!file || !memorialId) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`/api/upload?memorialId=${memorialId}&type=${type}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const result = await response.json();
+      console.log('Upload successful:', result);
+      toast({
+        title: "Upload Successful",
+        description: `File ${file.name} has been saved locally.`,
+      });
+
+      // UI update logic will be added in Phase 3.B
+      
+    } catch (err: any) {
+      console.error('Upload Error:', err);
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: err.message || "Could not upload the file.",
+      });
+    } finally {
+      setIsUploading(false);
+      // Reset the file input
+      event.target.value = '';
+    }
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!firestore || !memorialId) {
@@ -159,6 +201,21 @@ export default function EditMemorialPage() {
 
   return (
     <div className="space-y-8">
+      <input 
+        type="file" 
+        ref={profileFileInputRef} 
+        onChange={(e) => handleFileUpload(e, 'profile')}
+        className="hidden"
+        accept="image/png, image/jpeg, image/gif"
+      />
+      <input 
+        type="file" 
+        ref={galleryFileInputRef} 
+        onChange={(e) => handleFileUpload(e, 'gallery')}
+        className="hidden"
+        accept="image/png, image/jpeg, image/gif"
+      />
+
       <div>
         <Button variant="ghost" onClick={() => router.back()} className="mb-2 pl-0">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -172,6 +229,40 @@ export default function EditMemorialPage() {
 
       <Card className="rounded-[30px] max-w-2xl">
         <CardHeader>
+          <CardTitle>Profile Picture</CardTitle>
+          <CardDescription>
+            This is the main image that appears at the top of the memorial page.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-48 h-48 rounded-lg overflow-hidden group">
+            {memorial.profileImage?.url && (
+              <Image 
+                src={memorial.profileImage.url} 
+                alt="Profile image"
+                fill
+                className="object-cover"
+                data-ai-hint={memorial.profileImage.hint}
+              />
+            )}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-full"
+                  onClick={() => profileFileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                    <Upload className="mr-2 h-4 w-4"/>
+                    {isUploading ? 'Uploading...' : 'Change'}
+                </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card className="rounded-[30px] max-w-2xl">
+        <CardHeader>
           <CardTitle>Update Details</CardTitle>
           <CardDescription>
             Make your changes below and save to update the public memorial page.
@@ -179,7 +270,7 @@ export default function EditMemorialPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="memorial-edit-form">
               <FormField
                 control={form.control}
                 name="name"
@@ -223,21 +314,6 @@ export default function EditMemorialPage() {
                   </FormItem>
                 )}
               />
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => router.back()} className="rounded-[30px]">
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="rounded-[30px] bg-gradient-to-br from-primary to-accent text-primary-foreground"
-                  disabled={form.formState.isSubmitting}
-                >
-                  {form.formState.isSubmitting && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
-                </Button>
-              </div>
             </form>
           </Form>
         </CardContent>
@@ -256,10 +332,15 @@ export default function EditMemorialPage() {
             <div className="text-right">
                 <Button
                   className="rounded-[30px]"
-                  disabled={currentImageCount >= maxImageCount}
+                  disabled={currentImageCount >= maxImageCount || isUploading}
+                  onClick={() => galleryFileInputRef.current?.click()}
                 >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Photos
+                  {isUploading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                  )}
+                  {isUploading ? 'Uploading...' : 'Add Photos'}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-1">
                   You can add up to {maxImageCount} photos. ({currentImageCount}/{maxImageCount})
@@ -296,6 +377,23 @@ export default function EditMemorialPage() {
             )}
         </CardContent>
       </Card>
+      
+      <div className="flex justify-end gap-2 mt-8">
+        <Button type="button" variant="outline" onClick={() => router.back()} className="rounded-[30px]">
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          form="memorial-edit-form"
+          className="rounded-[30px] bg-gradient-to-br from-primary to-accent text-primary-foreground"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting && (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          )}
+          {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   )
 }

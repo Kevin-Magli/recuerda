@@ -6,9 +6,9 @@ import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { doc, updateDoc } from "firebase/firestore"
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore"
 
-import { useFirestore, useDoc, useMemoFirebase } from "@/firebase"
+import { useFirestore, useDoc, useMemoFirebase, useUser } from "@/firebase"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -74,6 +74,7 @@ export default function EditMemorialPage() {
   const params = useParams()
   const { toast } = useToast()
   const firestore = useFirestore()
+  const { user } = useUser()
   const memorialId = params?.id as string
 
   const [isUploading, setIsUploading] = useState(false);
@@ -98,17 +99,27 @@ export default function EditMemorialPage() {
 
   useEffect(() => {
     if (memorial) {
+      // Security check: Ensure the current user is the author of the memorial
+      if (user && memorial.authorId !== user.uid) {
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "You do not have permission to edit this memorial.",
+        });
+        router.push("/dashboard");
+        return;
+      }
       form.reset({
         name: memorial.name,
         lifeSpan: memorial.lifeSpan,
         bio: memorial.bio || "",
       })
     }
-  }, [memorial, form])
+  }, [memorial, user, router, toast, form])
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: 'profile' | 'gallery') => {
     const file = event.target.files?.[0];
-    if (!file || !memorialId) return;
+    if (!file || !memorialId || !memorialRef) return;
 
     setIsUploading(true);
     const formData = new FormData();
@@ -121,18 +132,35 @@ export default function EditMemorialPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
 
       const result = await response.json();
-      console.log('Upload successful:', result);
+      
+      if (type === 'profile') {
+        await updateDoc(memorialRef, {
+          profileImage: {
+            url: result.url,
+            hint: "custom image"
+          }
+        });
+      } else {
+        const newImage = {
+          id: file.name + Date.now(), // Create a pseudo-unique ID
+          url: result.url,
+          hint: "custom image"
+        };
+        await updateDoc(memorialRef, {
+          gallery: arrayUnion(newImage)
+        });
+      }
+
       toast({
         title: "Upload Successful",
-        description: `File ${file.name} has been saved locally.`,
+        description: `Your image has been added.`,
       });
 
-      // UI update logic will be added in Phase 3.B
-      
     } catch (err: any) {
       console.error('Upload Error:', err);
       toast({
@@ -142,8 +170,27 @@ export default function EditMemorialPage() {
       });
     } finally {
       setIsUploading(false);
-      // Reset the file input
-      event.target.value = '';
+      if(event.target) event.target.value = '';
+    }
+  };
+
+  const handleDeleteImage = async (imageToRemove: { id: string; url: string; hint: string }) => {
+    if (!memorialRef) return;
+    try {
+      await updateDoc(memorialRef, {
+        gallery: arrayRemove(imageToRemove)
+      });
+      toast({
+        title: "Image Removed",
+        description: "The image has been removed from the gallery.",
+      });
+    } catch (err: any) {
+      console.error('Delete Error:', err);
+      toast({
+        variant: "destructive",
+        title: "Deletion Failed",
+        description: err.message || "Could not remove the image.",
+      });
     }
   };
 
@@ -177,7 +224,7 @@ export default function EditMemorialPage() {
     }
   }
 
-  if (isLoading || !memorial) {
+  if (isLoading || !user || !memorial) {
     return <EditPageSkeleton />
   }
 
@@ -243,6 +290,7 @@ export default function EditMemorialPage() {
                 fill
                 className="object-cover"
                 data-ai-hint={memorial.profileImage.hint}
+                key={memorial.profileImage.url} 
               />
             )}
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
@@ -253,7 +301,11 @@ export default function EditMemorialPage() {
                   onClick={() => profileFileInputRef.current?.click()}
                   disabled={isUploading}
                 >
-                    <Upload className="mr-2 h-4 w-4"/>
+                    {isUploading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="mr-2 h-4 w-4" />
+                    )}
                     {isUploading ? 'Uploading...' : 'Change'}
                 </Button>
             </div>
@@ -359,9 +411,10 @@ export default function EditMemorialPage() {
                             fill
                             className="object-cover rounded-md"
                             data-ai-hint={image.hint}
+                            key={image.url}
                         />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
-                            <Button variant="destructive" size="icon" className="rounded-full h-8 w-8">
+                            <Button variant="destructive" size="icon" className="rounded-full h-8 w-8" onClick={() => handleDeleteImage(image)}>
                                 <Trash2 className="h-4 w-4" />
                                 <span className="sr-only">Delete image</span>
                             </Button>
@@ -396,4 +449,5 @@ export default function EditMemorialPage() {
       </div>
     </div>
   )
-}
+
+    

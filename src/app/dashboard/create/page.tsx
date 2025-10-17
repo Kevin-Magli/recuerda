@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Loader2 } from "lucide-react"
+import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -60,19 +61,29 @@ export default function CreateMemorialPage() {
     }
 
     try {
-      // Save to the top-level 'memorials' collection
       const memorialCollectionRef = collection(firestore, "memorials")
+      const profileImagePlaceholder = PlaceHolderImages.find(p => p.id.startsWith('memorial-'));
+      const galleryPlaceholders = PlaceHolderImages.filter(p => p.id.startsWith('gallery-')).slice(0, 5);
+
 
       await addDoc(memorialCollectionRef, {
-        authorId: user.uid, // Add authorId to link memorial to the user
+        authorId: user.uid,
         name: values.name,
         lifeSpan: values.lifeSpan,
         bio: values.bio,
         createdAt: serverTimestamp(),
-        profileImage: {
+        profileImage: profileImagePlaceholder ? {
+          url: profileImagePlaceholder.imageUrl,
+          hint: profileImagePlaceholder.imageHint,
+        } : {
           url: `https://picsum.photos/seed/${Math.random()}/600/400`,
           hint: "placeholder image",
         },
+        gallery: galleryPlaceholders.map(p => ({
+          id: p.id,
+          url: p.imageUrl,
+          hint: p.imageHint,
+        })),
       })
 
       toast({

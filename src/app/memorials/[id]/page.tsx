@@ -4,9 +4,7 @@
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { MessageSquare, Send } from 'lucide-react';
-import { doc, onSnapshot, getDoc } from 'firebase/firestore';
-import { getApps, getApp } from "firebase/app";
-import { useEffect } from 'react';
+import { doc } from 'firebase/firestore';
 import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -78,43 +76,6 @@ export default function MemorialPage() {
 
   const { data: memorial, isLoading, error } = useDoc<Memorial>(memorialRef);
   
-  useEffect(() => {
-    if (!params.id || !firestore) return;
-
-    console.log('--- Debug memorial page mount ---');
-    console.log('params.id', params.id);
-    console.log('Firebase apps:', getApps().map(a => ({ name: a.name, projectId: a.options?.projectId })));
-    try { console.log('getApp().options', getApp().options) } catch(e) { console.warn('no app ready', e) }
-
-    // quick getDoc test
-    (async () => {
-      try {
-        const snap = await getDoc(doc(firestore, 'memorials', params.id as string));
-        console.log('getDoc result exists?', snap.exists(), snap.data && snap.data());
-      } catch (err) {
-        console.error('getDoc error', err);
-      }
-    })();
-
-    const unsubscribe = onSnapshot(
-      doc(firestore, 'memorials', params.id as string),
-      snapshot => {
-        console.log('onSnapshot snapshot: exists?', snapshot.exists());
-        if (snapshot.exists()) {
-          console.log('snapshot data', snapshot.data());
-        } else {
-          console.log('snapshot no doc');
-        }
-      },
-      err => {
-        console.error('onSnapshot error callback', err);
-      }
-    );
-
-    return () => unsubscribe();
-  }, [params.id, firestore]);
-
-
   if (isLoading) {
     return <MemorialPageSkeleton />;
   }
@@ -130,13 +91,11 @@ export default function MemorialPage() {
   
   if (!memorial) {
     return (
-      <div className="p-8">
-        <h2 className="text-2xl font-bold mb-4">Memorial não encontrado (debug)</h2>
-        <pre className="bg-muted p-4 rounded-md">
-          <p><strong>params.id:</strong> {params?.id}</p>
-          <p><strong>memorial (from useDoc):</strong> {JSON.stringify(memorial)}</p>
-        </pre>
-        <p className="mt-4">Verifique o console do navegador e a aba "Network" para mais detalhes.</p>
+      <div className="flex h-screen items-center justify-center">
+        <div className="p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Memorial não encontrado</h2>
+          <p className="text-muted-foreground">O memorial que você está procurando não existe ou foi removido.</p>
+        </div>
       </div>
     );
   }
@@ -247,5 +206,3 @@ export default function MemorialPage() {
     </>
   );
 }
-
-    

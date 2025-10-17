@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -13,6 +14,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -27,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, ArrowLeft } from "lucide-react"
+import { Loader2, ArrowLeft, PlusCircle, Trash2 } from "lucide-react"
 import { Memorial } from "@/lib/definitions"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -150,6 +152,10 @@ export default function EditMemorialPage() {
       </div>
     )
   }
+  
+  const currentImageCount = memorial.gallery?.length || 0;
+  const maxImageCount = 10;
+
 
   return (
     <div className="space-y-8">
@@ -234,6 +240,60 @@ export default function EditMemorialPage() {
               </div>
             </form>
           </Form>
+        </CardContent>
+      </Card>
+      
+      {/* Gallery Management Card */}
+      <Card className="rounded-[30px] max-w-2xl">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Manage Gallery</CardTitle>
+              <CardDescription>
+                Add or remove photos from your memorial's gallery.
+              </CardDescription>
+            </div>
+            <div className="text-right">
+                <Button
+                  className="rounded-[30px]"
+                  disabled={currentImageCount >= maxImageCount}
+                >
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Photos
+                </Button>
+                <p className="text-xs text-muted-foreground mt-1">
+                  You can add up to {maxImageCount} photos. ({currentImageCount}/{maxImageCount})
+                </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+            {memorial.gallery && memorial.gallery.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {memorial.gallery.map((image) => (
+                    <div key={image.id} className="relative group aspect-square">
+                        <Image
+                            src={image.url}
+                            alt="Gallery image"
+                            fill
+                            className="object-cover rounded-md"
+                            data-ai-hint={image.hint}
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-md">
+                            <Button variant="destructive" size="icon" className="rounded-full h-8 w-8">
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete image</span>
+                            </Button>
+                        </div>
+                    </div>
+                ))}
+                </div>
+            ) : (
+                <div className="text-center py-12 border-2 border-dashed rounded-lg">
+                    <p className="text-muted-foreground">The gallery is empty.</p>
+                    <p className="text-sm text-muted-foreground">Click "Add Photos" to get started.</p>
+                </div>
+            )}
         </CardContent>
       </Card>
     </div>

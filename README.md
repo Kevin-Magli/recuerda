@@ -1,10 +1,10 @@
-# Eternity Pages - Developer Onboarding Guide
+# Recuerda - Developer Onboarding Guide
 
-Welcome to the Eternity Pages project. This document serves as a comprehensive guide for developers taking over or joining the project. Its purpose is to ensure a smooth transition and provide all the necessary context to continue development efficiently.
+Welcome to the Recuerda project. This document serves as a comprehensive guide for developers taking over or joining the project. Its purpose is to ensure a smooth transition and provide all the necessary context to continue development efficiently.
 
 ## 1. Project Overview
 
-Eternity Pages is a web application designed to create beautiful, respectful, and lasting memorial pages for loved ones. Users can create a personalized page with a biography, photo gallery, and a space for friends and family to leave tributes.
+Recuerda is a web application designed to create beautiful, respectful, and lasting memorial pages for loved ones. Users can create a personalized page with a biography, photo gallery, and a space for friends and family to leave tributes.
 
 The project also includes a Software-as-a-Service (SaaS) component, featuring a role-based system for different types of users:
 - **Free Users:** Can create basic memorial pages.

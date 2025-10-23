@@ -111,7 +111,7 @@ Understanding the file layout is key to navigating the codebase.
 
 This section outlines what is currently implemented and what the next steps are, focusing on the **Affiliate System**.
 
-### Completed Features (Fase 1 - Foundation)
+### Completed Features
 
 - **User Authentication:** Users can sign up and log in with email and password.
 - **Memorial Management:** Authenticated users can create, view, edit, and delete their own memorial pages. This includes uploading a profile picture and gallery images.
